@@ -26,7 +26,9 @@ module RedisCopy
       key_emitter = KeyEmitter.new(source, ui, options)
       strategem = Strategy.new(source, destination, ui, options)
 
-      dest_empty = !(destination.randomkey) # randomkey returns string unless db empty.
+      #twemproxy doesn't support RANDOMKEY, so let's just not care if the destination is empty or not.
+      dest_empty = !(destination.randomkey) unless options[:dest_is_proxy] # randomkey returns string unless db empty.
+      if options[:dest_is_proxy] dest_empty = false
 
       return false unless ui.confirm? <<-EODESC.strip_heredoc
         Source:      #{source.client.id}

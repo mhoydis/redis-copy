@@ -5,10 +5,10 @@ module RedisCopy
   # the 2.8 branch of Redis, and after 3.0.5 of the redis-rb gem.
   class KeyEmitter::Scan
     implements KeyEmitter do |redis, *_|
-      bin_version = Gem::Version.new(redis.info['redis_version'])
+      bin_version = Gem::Version.new(redis.info['redis_version']) unless options[:dest_is_proxy]
       bin_requirement = Gem::Requirement.new('>= 2.7.105')
 
-      next false unless bin_requirement.satisfied_by?(bin_version)
+      next false unless bin_requirement.satisfied_by?(bin_version) or options[:dest_is_proxy]
 
       redis.respond_to?(:scan_each)
     end

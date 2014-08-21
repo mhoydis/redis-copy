@@ -16,6 +16,7 @@ module RedisCopy
       debug:          false,
       allow_nonempty: false,
       pattern:        '*',
+      dest_is_proxy:  false,
     }.freeze unless defined?(DEFAULTS)
 
     def initialize(argv = ARGV)
@@ -98,6 +99,10 @@ module RedisCopy
 
         opts.on('--[no-]dry-run', 'Output configuration and exit') do |d|
           options[:dry_run] = true
+        end
+
+        opts.on('--[no-]dest_is_proxy', 'The destination is a proxy, such as twemproxy(nutcracker)') do |proxy|
+          options[:dest_is_proxy] = true
         end
 
         begin

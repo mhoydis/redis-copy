@@ -5,7 +5,7 @@ module RedisCopy
     class DumpRestore
       implements Strategy do |source, destination, *_|
         [source, destination].all? do |redis|
-          bin_version = Gem::Version.new(redis.info['redis_version'])
+          bin_version = Gem::Version.new(redis.info['redis_version']) unless options[:dest_is_proxy]
           bin_requirement = Gem::Requirement.new('>= 2.6.0')
 
           next false unless bin_requirement.satisfied_by?(bin_version)

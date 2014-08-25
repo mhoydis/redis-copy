@@ -9,6 +9,7 @@ require 'redis-copy/version'
 require 'redis-copy/ui'
 require 'redis-copy/strategy'
 require 'redis-copy/key-emitter'
+require 'optparse'
 
 module RedisCopy
   class << self
@@ -27,8 +28,9 @@ module RedisCopy
       strategem = Strategy.new(source, destination, ui, options)
 
       #twemproxy doesn't support RANDOMKEY, so let's just not care if the destination is empty or not.
-      dest_empty = !(destination.randomkey) unless options[:dest_is_proxy] # randomkey returns string unless db empty.
-      if options[:dest_is_proxy] dest_empty = false
+      #dest_empty = !(destination.randomkey) unless options[:dest_is_proxy] # randomkey returns string unless db empty.
+      #dest_empty = false if options[:dest_is_proxy]
+      dest_empty = false
 
       return false unless ui.confirm? <<-EODESC.strip_heredoc
         Source:      #{source.client.id}
@@ -103,7 +105,12 @@ module RedisCopy
       password = uri.password
 
       # Connect & Ping to ensure access.
-      Redis.new(host: host, port: port, db: db, password: password).tap(&:ping)
+      #if options[:dest_is_proxy] then
+        #puts "dest_is_proxy is set.  skipping ping in redis-copy.rb"
+        Redis.new(host: host, port: port, db: db, password: password)
+      #else 
+        #Redis.new(host: host, port: port, db: db, password: password).tap(&:ping)
+      #end
     rescue Redis::CommandError => e
       fail(Redis::CommandError,
            "There was a problem connecting to #{uri.to_s}\n#{e.message}")

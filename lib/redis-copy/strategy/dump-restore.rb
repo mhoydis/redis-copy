@@ -25,6 +25,13 @@ module RedisCopy
         translated_ttl = (ttl && ttl > 0) ? (ttl * 1000) : 0
 
         dumped_value = @src.dump(key)
+        
+        if Kernel.rand(100) == 1
+          File.open('/tmp/test.out','a') do |f|
+            f.puts "#{key},#{dumped_value}"
+          end
+        end
+        
         @dst.restore(key, translated_ttl, dumped_value)
 
         return true
